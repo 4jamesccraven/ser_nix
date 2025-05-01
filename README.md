@@ -1,5 +1,8 @@
 An opinionated Nix serialiser, using the serde frame-work.
 
+> [!WARNING]
+> This is alpha software
+
 > [!NOTE]
 > This is not a deserialiser, for that look into
 > [tvix_serde](https://docs.tvix.dev/rust/tvix_serde/index.html) (which only

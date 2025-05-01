@@ -1,5 +1,6 @@
 use serde::ser;
 
+/// Error type for ser_nix serialisation
 #[derive(Debug)]
 pub enum Error {
     Message(String),

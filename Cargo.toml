@@ -2,6 +2,13 @@
 name = "ser_nix"
 version = "0.1.0"
 edition = "2024"
+description = "An opinionated nix serialiser for serde.rs"
+authors = ["James Craven <4jamesccraven@gmail.com>"]
+license = "MIT"
+homepage = "https://github.com/4jamesccraven/ser_nix"
+repository = "https://github.com/4jamesccraven/ser_nix"
+readme = "README.md"
+categories = ["encoding"]
 
 [dependencies]
 serde = { version = "1.0.216", features = ["derive"] }
