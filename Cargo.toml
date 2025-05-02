@@ -1,6 +1,6 @@
 [package]
 name = "ser_nix"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2024"
 description = "An opinionated nix serialiser for serde.rs"
 authors = ["James Craven <4jamesccraven@gmail.com>"]

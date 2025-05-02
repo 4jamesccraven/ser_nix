@@ -1,6 +1,6 @@
 use super::error::Error;
 
-use serde::{ser, Serialize};
+use serde::{Serialize, ser};
 
 pub struct Serializer {
     pub output: String,
@@ -123,10 +123,6 @@ impl<'a> ser::Serializer for &'a mut Serializer {
                     true => self.output += "\t",
                     false => self.output += "\\t",
                 },
-                c if c.is_control() => {
-                    use std::fmt::Write;
-                    write!(self.output, "\\x{:02x}", c as u32).unwrap();
-                }
                 c => self.output.push(c),
             }
         }
