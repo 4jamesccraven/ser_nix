@@ -109,7 +109,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
                     false => self.output += "\\\\",
                 },
                 '$' => match chars.peek() {
-                    Some(&'{') => self.output += "$$",
+                    Some(&'{') => self.output += "''$",
                     _ => self.output += "$",
                 },
                 '\n' => match multiline {

@@ -1,6 +1,6 @@
 [package]
 name = "ser_nix"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 description = "An opinionated nix serialiser for serde.rs"
 authors = ["James Craven <4jamesccraven@gmail.com>"]
@@ -12,3 +12,6 @@ categories = ["encoding"]
 
 [dependencies]
 serde = { version = "1.0.216", features = ["derive"] }
+
+[dev-dependencies]
+indexmap = { version = "2.9.0", features = ["serde"] }

@@ -154,7 +154,7 @@ mod test {
 
         let test_str = to_string(&test).unwrap();
 
-        let expected = String::from("\"$${} $ \\\" \\t \\n ' \\\\\"");
+        let expected = String::from("\"''${} $ \\\" \\t \\n ' \\\\\"");
 
         assert_eq!(test_str, expected);
     }
@@ -185,7 +185,7 @@ mod test {
             "  consectetur adipiscing elit,\n",
             "  seddo eiusmod \ttempor incididunt\n",
             "  ut labore et dolore magnam\n",
-            "  aliquam $${} \" quaerat voluptatem. Ut\n",
+            "  aliquam ''${} \" quaerat voluptatem. Ut\n",
             "  enim aeque doleamus animo, cum\n",
             "  corpore $ dolemus, \\ fieri tamen\n",
             "  permagna accessio potest, si\n",
