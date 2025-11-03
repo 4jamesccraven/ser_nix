@@ -1,6 +1,6 @@
 #[cfg(test)]
 mod test {
-    use super::super::to_string;
+    use crate::to_string;
     use indexmap::IndexMap;
     use serde::Serialize;
 
@@ -276,6 +276,192 @@ mod test {
         );
 
         assert_eq!(none_test, expected);
+    }
+
+    #[test]
+    fn path_with_serialize_with() {
+        use crate::as_nix_path;
+        use std::path::PathBuf;
+
+        #[derive(Serialize)]
+        struct Config {
+            #[serde(serialize_with = "as_nix_path")]
+            source: PathBuf,
+            #[serde(serialize_with = "as_nix_path")]
+            config: PathBuf,
+        }
+
+        let config = Config {
+            source: PathBuf::from("./hardware-configuration.nix"),
+            config: PathBuf::from("/etc/nixos/configuration.nix"),
+        };
+
+        let config_str = to_string(&config).unwrap();
+
+        #[rustfmt::skip]
+        let expected = concat!(
+            "{\n",
+            "  source = ./hardware-configuration.nix;\n",
+            "  config = /etc/nixos/configuration.nix;\n",
+            "}",
+        );
+
+        assert_eq!(config_str, expected);
+    }
+
+    #[test]
+    fn path_with_nix_path_buf_wrapper() {
+        use crate::NixPathBuf;
+
+        #[derive(Serialize)]
+        struct Config {
+            source: NixPathBuf,
+            config: NixPathBuf,
+        }
+
+        let config = Config {
+            source: NixPathBuf::new("./hardware-configuration.nix"),
+            config: NixPathBuf::new("/etc/nixos/configuration.nix"),
+        };
+
+        let config_str = to_string(&config).unwrap();
+
+        #[rustfmt::skip]
+        let expected = concat!(
+            "{\n",
+            "  source = ./hardware-configuration.nix;\n",
+            "  config = /etc/nixos/configuration.nix;\n",
+            "}",
+        );
+
+        assert_eq!(config_str, expected);
+    }
+
+    #[test]
+    fn nix_path_borrowed() {
+        use crate::NixPath;
+        use std::path::Path;
+
+        let path = Path::new("./test.nix");
+        let nix_path = NixPath::new(path);
+
+        let result = to_string(&nix_path).unwrap();
+        assert_eq!(result, "./test.nix");
+    }
+
+    #[test]
+    fn optional_path() {
+        use crate::as_optional_nix_path;
+        use std::path::{Path, PathBuf};
+
+        #[derive(Serialize)]
+        struct Config<'a> {
+            #[serde(serialize_with = "as_optional_nix_path")]
+            owned: Option<PathBuf>,
+            #[serde(serialize_with = "as_optional_nix_path")]
+            borrowed: Option<&'a Path>,
+            #[serde(serialize_with = "as_optional_nix_path")]
+            none: Option<PathBuf>,
+        }
+
+        let config = Config {
+            owned: Some(PathBuf::from("./owned.nix")),
+            borrowed: Some(Path::new("./borrowed.nix")),
+            none: None,
+        };
+
+        let config_str = to_string(&config).unwrap();
+
+        #[rustfmt::skip]
+        let expected = concat!(
+            "{\n",
+            "  owned = ./owned.nix;\n",
+            "  borrowed = ./borrowed.nix;\n",
+            "  none = null;\n",
+            "}",
+        );
+
+        assert_eq!(config_str, expected);
+    }
+
+    #[test]
+    fn relative_path_gets_prefix() {
+        use crate::NixPathBuf;
+
+        // Paths without ./ prefix get it automatically
+        let path = NixPathBuf::new("foo.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, "./foo.nix");
+
+        // Paths with ./ prefix stay unchanged
+        let path = NixPathBuf::new("./foo.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, "./foo.nix");
+
+        // Paths with ../ prefix stay unchanged
+        let path = NixPathBuf::new("../foo.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, "../foo.nix");
+
+        // Absolute paths stay unchanged
+        let path = NixPathBuf::new("/etc/nixos/foo.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, "/etc/nixos/foo.nix");
+    }
+
+    #[test]
+    fn path_with_spaces() {
+        use crate::NixPathBuf;
+
+        // Relative path without prefix
+        let path = NixPathBuf::new("path with spaces.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, r#"./. + "path with spaces.nix""#);
+
+        // Relative path with ./ prefix
+        let path = NixPathBuf::new("./path with spaces.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, r#"./. + "path with spaces.nix""#);
+
+        // Relative path with ../ prefix
+        let path = NixPathBuf::new("../path with spaces.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, r#"../. + "path with spaces.nix""#);
+
+        // Absolute path
+        let path = NixPathBuf::new("/etc/nixos/path with spaces.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, r#"/. + "/etc/nixos/path with spaces.nix""#);
+    }
+
+    #[test]
+    fn path_with_special_chars() {
+        use crate::NixPathBuf;
+
+        // Path with double quotes - must be escaped
+        let path = NixPathBuf::new(r#"path"with"quotes.nix"#);
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, r#"./. + "path\"with\"quotes.nix""#);
+
+        // Path with single quotes - doesn't require quoting
+        let path = NixPathBuf::new("path'with'quotes.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, "./path'with'quotes.nix");
+
+        // Path with dollar sign not followed by { - doesn't require quoting
+        let path = NixPathBuf::new("path$var.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, "./path$var.nix");
+
+        // Path with ${ - must be escaped
+        let path = NixPathBuf::new("path${var}.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, r#"./. + "path\${var}.nix""#);
+
+        // Path with backslash - must be escaped
+        let path = NixPathBuf::new(r"path\with\backslash.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, r#"./. + "path\\with\\backslash.nix""#);
     }
 
     #[test]
