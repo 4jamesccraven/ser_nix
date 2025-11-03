@@ -220,6 +220,7 @@ mod test {
         let expected = concat!(
             "{\n",
             "  a = 32;\n",
+            "  b = null;\n",
             "}",
         );
 
@@ -240,11 +241,41 @@ mod test {
         let expected = concat!(
             "{\n",
             "  1 = 1;\n",
+            "  2 = null;\n",
             "  3 = 3;\n",
             "}",
         );
 
         assert_eq!(none_map_test, expected);
+    }
+
+    #[test]
+    fn skip_serializing_if_none() {
+        #[derive(Serialize)]
+        struct OptionalVals {
+            a: Option<i32>,
+            #[serde(skip_serializing_if = "Option::is_none")]
+            b: Option<i32>,
+            c: Option<i32>,
+        }
+
+        let none = OptionalVals {
+            a: Some(32),
+            b: None,
+            c: Some(64),
+        };
+
+        let none_test = to_string(&none).unwrap();
+
+        #[rustfmt::skip]
+        let expected = concat!(
+            "{\n",
+            "  a = 32;\n",
+            "  c = 64;\n",
+            "}",
+        );
+
+        assert_eq!(none_test, expected);
     }
 
     #[test]

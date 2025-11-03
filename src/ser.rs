@@ -154,7 +154,7 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     }
 
     fn serialize_unit(self) -> Result<Self::Ok, Self::Error> {
-        self.output += "NULL";
+        self.output += "null";
         Ok(())
     }
 
