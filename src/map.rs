@@ -48,11 +48,6 @@ impl<'a> ser::SerializeMap for &'a mut Serializer {
         value.serialize(&mut value_serializer)?;
         let val = value_serializer.output;
 
-        if val == "NULL" {
-            self.pending_key = None;
-            return Ok(());
-        }
-
         self.output += "\n";
 
         self.indent();

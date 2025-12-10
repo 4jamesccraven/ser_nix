@@ -30,10 +30,6 @@ impl<'a> ser::SerializeStruct for &'a mut Serializer {
         value.serialize(&mut val_serializer)?;
         let val = val_serializer.output;
 
-        if val == "NULL" {
-            return Ok(());
-        }
-
         self.indent();
         key.serialize(&mut key_serializer)?;
         let mut base_key = key_serializer.output;
