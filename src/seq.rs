@@ -3,7 +3,7 @@ use super::ser::Serializer;
 
 use serde::{ser, Serialize};
 
-impl<'a> ser::SerializeSeq for &'a mut Serializer {
+impl ser::SerializeSeq for &mut Serializer {
     type Ok = ();
     type Error = Error;
 

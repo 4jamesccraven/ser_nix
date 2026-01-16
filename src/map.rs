@@ -3,7 +3,7 @@ use super::ser::Serializer;
 
 use serde::{ser, Serialize};
 
-impl<'a> ser::SerializeMap for &'a mut Serializer {
+impl ser::SerializeMap for &mut Serializer {
     type Ok = ();
     type Error = Error;
 
@@ -25,10 +25,7 @@ impl<'a> ser::SerializeMap for &'a mut Serializer {
                 .strip_prefix("\"")
                 .and_then(|s| s.strip_suffix("\""));
 
-            match try_strip {
-                Some(str) => base_key = str.to_string(),
-                None => {}
-            }
+            if let Some(str) = try_strip { base_key = str.to_string() }
         }
 
         self.pending_key = Some(base_key);

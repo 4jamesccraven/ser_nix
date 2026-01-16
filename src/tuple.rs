@@ -3,7 +3,7 @@ use super::ser::Serializer;
 
 use serde::{ser, Serialize};
 
-impl<'a> ser::SerializeTuple for &'a mut Serializer {
+impl ser::SerializeTuple for &mut Serializer {
     type Ok = ();
     type Error = Error;
 
@@ -23,7 +23,7 @@ impl<'a> ser::SerializeTuple for &'a mut Serializer {
     }
 }
 
-impl<'a> ser::SerializeTupleStruct for &'a mut Serializer {
+impl ser::SerializeTupleStruct for &mut Serializer {
     type Ok = ();
     type Error = Error;
 
@@ -43,7 +43,7 @@ impl<'a> ser::SerializeTupleStruct for &'a mut Serializer {
     }
 }
 
-impl<'a> ser::SerializeTupleVariant for &'a mut Serializer {
+impl ser::SerializeTupleVariant for &mut Serializer {
     type Ok = ();
     type Error = Error;
 

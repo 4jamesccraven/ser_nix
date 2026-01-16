@@ -3,7 +3,7 @@ use super::ser::Serializer;
 
 use serde::{ser, Serialize};
 
-impl<'a> ser::SerializeStruct for &'a mut Serializer {
+impl ser::SerializeStruct for &mut Serializer {
     type Ok = ();
     type Error = Error;
 
@@ -40,10 +40,7 @@ impl<'a> ser::SerializeStruct for &'a mut Serializer {
                 .strip_prefix("\"")
                 .and_then(|s| s.strip_suffix("\""));
 
-            match try_strip {
-                Some(str) => base_key = str.to_string(),
-                None => {}
-            }
+            if let Some(str) = try_strip { base_key = str.to_string() }
         }
 
         self.output += &base_key;
@@ -62,7 +59,7 @@ impl<'a> ser::SerializeStruct for &'a mut Serializer {
     }
 }
 
-impl<'a> ser::SerializeStructVariant for &'a mut Serializer {
+impl ser::SerializeStructVariant for &mut Serializer {
     type Ok = ();
     type Error = Error;
 

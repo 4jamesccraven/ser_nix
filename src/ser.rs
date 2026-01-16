@@ -14,7 +14,7 @@ impl Serializer {
     }
 }
 
-impl<'a> ser::Serializer for &'a mut Serializer {
+impl ser::Serializer for &mut Serializer {
     type Ok = ();
     type Error = Error;
 
@@ -212,7 +212,6 @@ impl<'a> ser::Serializer for &'a mut Serializer {
     {
         let lower: String = variant
             .chars()
-            .into_iter()
             .enumerate()
             .map(|(i, c)| {
                 if i == 0 && c.is_uppercase() {

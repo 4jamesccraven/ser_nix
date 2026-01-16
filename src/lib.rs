@@ -143,7 +143,7 @@ mod test;
 mod tuple;
 
 pub use error::Error;
-pub use path::{as_nix_path, as_optional_nix_path, NixPath, NixPathBuf};
+pub use path::{NixPath, NixPathBuf, as_nix_path, as_optional_nix_path};
 use ser::Serializer;
 
 use serde::Serialize;
@@ -169,7 +169,7 @@ where
 }
 
 /// Removes extra whitespace that gets left behind due to indentation
-fn post_processor(serialized: &String) -> String {
+fn post_processor(serialized: &str) -> String {
     serialized
         .lines()
         .map(|l| if l.chars().any(|c| c != ' ') { l } else { "" })
