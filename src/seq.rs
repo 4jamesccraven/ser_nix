@@ -1,7 +1,7 @@
 use super::error::Error;
 use super::ser::Serializer;
 
-use serde::{Serialize, ser};
+use serde::{ser, Serialize};
 
 impl<'a> ser::SerializeSeq for &'a mut Serializer {
     type Ok = ();

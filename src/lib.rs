@@ -143,7 +143,7 @@ mod test;
 mod tuple;
 
 pub use error::Error;
-pub use path::{NixPath, NixPathBuf, as_nix_path, as_optional_nix_path};
+pub use path::{as_nix_path, as_optional_nix_path, NixPath, NixPathBuf};
 use ser::Serializer;
 
 use serde::Serialize;

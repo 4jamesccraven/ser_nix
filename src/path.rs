@@ -1,5 +1,5 @@
 use crate::error::Error;
-use serde::{Serialize, Serializer, ser};
+use serde::{ser, Serialize, Serializer};
 use std::borrow::Cow;
 use std::ops::Deref;
 use std::path::{Component, Path, PathBuf};
