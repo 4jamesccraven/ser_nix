@@ -17,8 +17,9 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             cargo
-            rustc
             libgcc
+            rustc
+            rustfmt
           ];
 
           RUST_SRC_PATH = "${pkgs.rustPlatform.rustLibSrc}";
