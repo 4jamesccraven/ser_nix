@@ -17,6 +17,7 @@
         devShells.default = pkgs.mkShell {
           buildInputs = with pkgs; [
             cargo
+            clippy
             libgcc
             rustc
             rustfmt

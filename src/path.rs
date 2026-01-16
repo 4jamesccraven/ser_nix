@@ -27,14 +27,12 @@ impl ser::Serializer for PathLitEmitter<'_> {
         Ok(())
     }
 
-    serde::serde_if_integer128! {
-        fn serialize_i128(self, _v: i128) -> Result<Self::Ok, Self::Error> {
-            Err(ser::Error::custom("expected Path"))
-        }
+    fn serialize_i128(self, _v: i128) -> Result<Self::Ok, Self::Error> {
+        Err(ser::Error::custom("expected Path"))
+    }
 
-        fn serialize_u128(self, _v: u128) -> Result<Self::Ok, Self::Error> {
-            Err(ser::Error::custom("expected Path"))
-        }
+    fn serialize_u128(self, _v: u128) -> Result<Self::Ok, Self::Error> {
+        Err(ser::Error::custom("expected Path"))
     }
 
     fn serialize_bool(self, _v: bool) -> Result<Self::Ok, Self::Error> {
