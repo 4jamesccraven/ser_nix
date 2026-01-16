@@ -184,12 +184,19 @@ impl<'a> ser::Serializer for &'a mut Serializer {
 
     fn serialize_newtype_struct<T>(
         self,
-        _name: &'static str,
+        name: &'static str,
         value: &T,
     ) -> Result<Self::Ok, Self::Error>
     where
         T: ?Sized + Serialize,
     {
+        if name == crate::path::TOKEN {
+            use crate::path::PathLitEmitter;
+            let emitter = PathLitEmitter {
+                output: &mut self.output,
+            };
+            return value.serialize(emitter);
+        }
         value.serialize(self)
     }
 
