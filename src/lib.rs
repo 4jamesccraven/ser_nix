@@ -134,6 +134,7 @@
 //! it is not as a full featured as other serde implemenatations, but I intend
 //! to change that over time
 mod error;
+mod literal;
 mod map;
 mod path;
 mod seq;
@@ -143,7 +144,8 @@ mod test;
 mod tuple;
 
 pub use error::Error;
-pub use path::{NixPath, NixPathBuf, as_nix_path, as_optional_nix_path};
+pub use literal::{as_literal, as_optional_literal, NixLiteral};
+pub use path::{as_nix_path, as_optional_nix_path, NixPath, NixPathBuf};
 use ser::Serializer;
 
 use serde::Serialize;
