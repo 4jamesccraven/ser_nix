@@ -144,8 +144,8 @@ mod test;
 mod tuple;
 
 pub use error::Error;
-pub use literal::{as_literal, as_optional_literal, NixLiteral};
-pub use path::{as_nix_path, as_optional_nix_path, NixPath, NixPathBuf};
+pub use literal::{NixLiteral, as_literal, as_optional_literal};
+pub use path::{NixPath, NixPathBuf, as_nix_path, as_optional_nix_path};
 use ser::Serializer;
 
 use serde::Serialize;

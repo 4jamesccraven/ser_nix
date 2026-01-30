@@ -1,7 +1,7 @@
 use super::error::Error;
 use super::ser::Serializer;
 
-use serde::{ser, Serialize};
+use serde::{Serialize, ser};
 
 impl ser::SerializeStruct for &mut Serializer {
     type Ok = ();
@@ -40,7 +40,9 @@ impl ser::SerializeStruct for &mut Serializer {
                 .strip_prefix("\"")
                 .and_then(|s| s.strip_suffix("\""));
 
-            if let Some(str) = try_strip { base_key = str.to_string() }
+            if let Some(str) = try_strip {
+                base_key = str.to_string()
+            }
         }
 
         self.output += &base_key;
