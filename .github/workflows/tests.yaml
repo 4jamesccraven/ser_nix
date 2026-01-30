@@ -1,14 +1,12 @@
-name: Formatting
+name: Tests
 
 on:
   pull_request:
   push:
-    branches:
-      - main
-      - ci/formatting
+    branches: [main]
 
 jobs:
-  rustfmt:
+  checks:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -19,6 +17,8 @@ jobs:
           components: rustfmt
           override: true
 
+      - name: Cargo Test
+        run: cargo test --all
+
       - name: Check formatting
         run: cargo fmt --all -- --check
-
