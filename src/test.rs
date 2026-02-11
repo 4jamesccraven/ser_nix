@@ -443,15 +443,15 @@ mod test {
         let result = to_string(&path).unwrap();
         assert_eq!(result, r#"./. + "path\"with\"quotes.nix""#);
 
-        // Path with single quotes - doesn't require quoting
+        // Path with single quotes - not valid in Nix path literals
         let path = NixPathBuf::new("path'with'quotes.nix");
         let result = to_string(&path).unwrap();
-        assert_eq!(result, "./path'with'quotes.nix");
+        assert_eq!(result, r#"./. + "path'with'quotes.nix""#);
 
-        // Path with dollar sign not followed by { - doesn't require quoting
+        // Path with dollar sign not followed by { - not valid in Nix path literals
         let path = NixPathBuf::new("path$var.nix");
         let result = to_string(&path).unwrap();
-        assert_eq!(result, "./path$var.nix");
+        assert_eq!(result, r#"./. + "path$var.nix""#);
 
         // Path with ${ - must be escaped
         let path = NixPathBuf::new("path${var}.nix");
@@ -462,6 +462,11 @@ mod test {
         let path = NixPathBuf::new(r"path\with\backslash.nix");
         let result = to_string(&path).unwrap();
         assert_eq!(result, r#"./. + "path\\with\\backslash.nix""#);
+
+        // Path with percent-encoded characters (e.g. %2F)
+        let path = NixPathBuf::new("/tmp/test%2Fdir/devenv.nix");
+        let result = to_string(&path).unwrap();
+        assert_eq!(result, r#"/. + "/tmp/test%2Fdir/devenv.nix""#);
     }
 
     #[test]
