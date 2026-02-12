@@ -126,13 +126,6 @@
 //! // source is unquoted: ./hardware-configuration.nix
 //! // description is quoted: "Hardware config"
 //! ```
-//!
-//! ## Disclaimer
-//!
-//! This library was created mostly to be used as a subcomponent of my main
-//! project, [mkdev](https://github.com/4jamesccraven/mkdev). Because of that
-//! it is not as a full featured as other serde implemenatations, but I intend
-//! to change that over time
 mod error;
 mod literal;
 mod map;
