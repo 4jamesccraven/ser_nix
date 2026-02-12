@@ -319,11 +319,19 @@ impl Serialize for NixPath<'_> {
 }
 
 /// Check if a path string contains characters that require quoting in Nix.
+///
+/// Nix path literals only allow `PATH_CHAR` (`[a-zA-Z0-9._\-+]`) and `/`.
+/// See: https://github.com/NixOS/nix/blob/master/src/libexpr/lexer.l
+///
+/// Any other character (e.g. spaces, `%`, `$`, `@`) requires the path to be
+/// expressed as a string concatenation like `/. + "/path"` instead of a bare
+/// path literal.
 fn needs_quoting(s: &str) -> bool {
-    let bytes = s.as_bytes();
-    (0..bytes.len()).any(|i| {
-        matches!(bytes[i], b'"' | b'\\' | b' ' | b'\t' | b'\n' | b'\r')
-            || (bytes[i] == b'$' && bytes.get(i + 1) == Some(&b'{'))
+    s.bytes().any(|b| {
+        !matches!(b,
+            b'a'..=b'z' | b'A'..=b'Z' | b'0'..=b'9'
+            | b'.' | b'_' | b'-' | b'+' | b'/'
+        )
     })
 }
 
