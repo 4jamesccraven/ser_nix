@@ -470,6 +470,59 @@ mod test {
     }
 
     #[test]
+    fn map_keys_that_are_valid_identifiers_are_unquoted() {
+        let map: IndexMap<String, bool> = [
+            ("enable", true),
+            ("with-setting", true),
+            ("_private", false),
+        ]
+        .iter()
+        .map(|(a, b)| (a.to_string(), *b))
+        .collect();
+
+        let map_str = to_string(&map).unwrap();
+
+        #[rustfmt::skip]
+        let expected = concat!(
+            "{\n",
+            "  enable = true;\n",
+            "  with-setting = true;\n",
+            "  _private = false;\n",
+            "}"
+        );
+
+        assert_eq!(map_str, expected);
+    }
+
+    #[test]
+    fn map_keys_that_are_not_valid_identifiers_are_quoted() {
+        let map: IndexMap<String, IndexMap<(), ()>> = [
+            ("8080/tcp", IndexMap::new()),
+            ("/var/data", IndexMap::new()),
+            ("key with spaces", IndexMap::new()),
+        ]
+        .iter()
+        .map(|(a, b)| (a.to_string(), b.clone()))
+        .collect();
+
+        let map_str = to_string(&map).unwrap();
+
+        #[rustfmt::skip]
+        let expected = concat!(
+            "{\n",
+            "  \"8080/tcp\" = {\n",
+            "  };\n",
+            "  \"/var/data\" = {\n",
+            "  };\n",
+            "  \"key with spaces\" = {\n",
+            "  };\n",
+            "}"
+        );
+
+        assert_eq!(map_str, expected);
+    }
+
+    #[test]
     fn newtype_var() {
         #[derive(Serialize)]
         enum Test {
