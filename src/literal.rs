@@ -1,4 +1,4 @@
-use serde::{Serialize, Serializer};
+use serde::{Serialize, Serializer, ser::SerializeSeq};
 use std::borrow::Cow;
 
 pub(crate) const TOKEN: &str = "$ser_nix::private::Literal";
@@ -146,4 +146,49 @@ where
         Some(v) => serialize_literal(v, serializer),
         None => serializer.serialize_none(),
     }
+}
+
+/// Serialize a `Vec<String>` or `&'a [&'a str]` as a list of raw Nix expressions.
+///
+/// # Example
+///
+/// ```
+/// use serde::Serialize;
+/// use ser_nix::to_string;
+///
+/// #[derive(Serialize)]
+/// struct Config<'a> {
+///     #[serde(serialize_with = "ser_nix::as_literal_seq")]
+///     packages: &'a [&'a str],
+/// }
+///
+/// #[derive(Serialize)]
+/// struct ConfigBuf {
+///     #[serde(serialize_with = "ser_nix::as_literal_seq")]
+///     packages: Vec<String>,
+/// }
+///
+/// let config = Config {
+///     packages: &["pkgs.hello"],
+/// };
+///
+/// let config_buf = ConfigBuf {
+///     packages: vec!["pkgs.hello".to_string()],
+/// };
+///
+/// let config = to_string(&config).unwrap();
+/// let config_buf = to_string(&config_buf).unwrap();
+/// assert_eq!(config, "{\n  packages = [\n    pkgs.hello\n  ];\n}");
+/// assert_eq!(config_buf, "{\n  packages = [\n    pkgs.hello\n  ];\n}");
+/// ```
+pub fn as_literal_seq<T, S>(exprs: &[T], s: S) -> Result<S::Ok, S::Error>
+where
+    T: AsRef<str>,
+    S: Serializer,
+{
+    let mut seq = s.serialize_seq(Some(exprs.len()))?;
+    for expr in exprs {
+        seq.serialize_element(&NixLiteral::new(expr.as_ref()))?;
+    }
+    seq.end()
 }

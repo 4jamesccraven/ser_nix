@@ -137,7 +137,7 @@ mod test;
 mod tuple;
 
 pub use error::Error;
-pub use literal::{NixLiteral, as_literal, as_optional_literal};
+pub use literal::{NixLiteral, as_literal, as_literal_seq, as_optional_literal};
 pub use path::{NixPath, NixPathBuf, as_nix_path, as_optional_nix_path};
 use ser::Serializer;
 
