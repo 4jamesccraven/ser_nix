@@ -39,10 +39,9 @@ impl ser::SerializeMap for &mut Serializer {
         if let Some(stripped) = base_key
             .strip_prefix("\"")
             .and_then(|s| s.strip_suffix("\""))
+            && is_nix_identifier(stripped)
         {
-            if is_nix_identifier(stripped) {
-                base_key = stripped.to_string();
-            }
+            base_key = stripped.to_string();
         }
 
         self.pending_key = Some(base_key);
