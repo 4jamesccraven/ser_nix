@@ -3,6 +3,20 @@ use super::ser::Serializer;
 
 use serde::{Serialize, ser};
 
+/// Returns `true` if `s` is a valid Nix identifier that can appear unquoted
+/// as an attribute name (e.g. `foo`, `build-inputs`, `x86_64-linux`).
+///
+/// Keys that are not valid identifiers (e.g. `8080/tcp`, `/var/data`) must
+/// remain quoted in Nix attribute sets.
+fn is_nix_identifier(s: &str) -> bool {
+    let mut chars = s.chars();
+    match chars.next() {
+        Some(c) if c.is_ascii_alphabetic() || c == '_' => {}
+        _ => return false,
+    }
+    chars.all(|c| c.is_ascii_alphanumeric() || c == '_' || c == '-' || c == '\'')
+}
+
 impl ser::SerializeMap for &mut Serializer {
     type Ok = ();
     type Error = Error;
@@ -19,14 +33,15 @@ impl ser::SerializeMap for &mut Serializer {
         key.serialize(&mut key_serializer)?;
         let mut base_key = key_serializer.output;
 
-        // TODO: Add cases where keys need to be escaped
-        if true {
-            let try_strip = base_key
-                .strip_prefix("\"")
-                .and_then(|s| s.strip_suffix("\""));
-
-            if let Some(str) = try_strip {
-                base_key = str.to_string()
+        // Only strip quotes from keys that are valid Nix identifiers.
+        // Keys like "8080/tcp" must remain quoted because they contain
+        // characters not allowed in bare Nix attribute names.
+        if let Some(stripped) = base_key
+            .strip_prefix("\"")
+            .and_then(|s| s.strip_suffix("\""))
+        {
+            if is_nix_identifier(stripped) {
+                base_key = stripped.to_string();
             }
         }
 
